@@ -1,6 +1,6 @@
 {
   "name": "boom-video-player",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "",
   "main": "./dist/index.cjs.js",
   "module": "./dist/index.esm.js",
@@ -9,7 +9,8 @@
     "lint": "eslint .",
     "commit": "git cz",
     "build": "rollup -c",
-      "dev": "rollup -w -c"
+    "dev": "rollup -w -c",
+    "release": "standard-version"
   },
   "keywords": [],
   "author": "",
@@ -30,6 +31,7 @@
     "eslint-plugin-import": "^2.25.4",
     "lint-staged": "^12.1.7",
     "rollup": "^2.64.0",
+    "standard-version": "^9.3.2",
     "typescript": "^4.5.4",
     "yorkie": "^2.0.0"
   },
@@ -38,7 +40,7 @@
     "commit-msg": "commitlint -e -V"
   },
   "lint-staged": {
-    "**/*.{js,jsx,ts,tsx}": [
+    "**/*.{ts,tsx}": [
       "eslint --fix"
     ]
   },
