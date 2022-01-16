@@ -3,6 +3,7 @@ module.exports = {
     'prefer-destructuring': ['error', { object: true, array: false }],
     'brace-style': ['error', 'stroustrup', { allowSingleLine: true }],
     'no-shadow': 1,
+    'no-param-reassign':0,
     indent: [
         'error',
         4,

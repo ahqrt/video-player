@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div style="width: 700px;height: 393px" id="player-container"></div>
+<button id="startPlay">播放</button>
+<button id="stopPlay">暂停</button>
+    <script src="../dist/videoPlayer.js"></script>
+    <script>
+        const player = new BoomVideoPlayer({
+            playerUrl: 'https://hb.boom.cn:443/test/1640653482/var/www/html/media/files/61b1b866f432de47913ccab3/1634731634340918 (1).mp4',
+            // autoplay: 'autoplay'
+        })
+        player.createGUI(document.getElementById('player-container'))
+        player.initPlayer()
+        const startPlay = document.getElementById('startPlay')
+        startPlay.addEventListener('click', () => {
+            player.play()
+        })
+        const stopPlay = document.getElementById('stopPlay')
+        stopPlay.addEventListener('click', () => {
+            player.pause()
+        })
+    </script>
+</body>
+</html>
