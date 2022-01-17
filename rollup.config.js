@@ -1,7 +1,7 @@
 import resolve  from '@rollup/plugin-node-resolve'
 import typescript from "@rollup/plugin-typescript"
 import commonjs from "@rollup/plugin-commonjs"
-
+import { terser } from 'rollup-plugin-terser'
 export default [
     {
         input: './src/index.ts',
@@ -12,7 +12,7 @@ export default [
             format: 'cjs',
             entryFileNames: '[name].cjs.js',
         },
-        plugins: [resolve(), commonjs(), typescript()],
+        plugins: [terser(), resolve(), commonjs(), typescript()],
     },
     {
         input: './src/index.ts',
@@ -22,7 +22,7 @@ export default [
             format: 'esm',
             entryFileNames: '[name].esm.js',
         },
-        plugins: [resolve(), commonjs(), typescript()],
+        plugins: [terser(), resolve(), commonjs(), typescript()],
     },
     {
         input: './src/index.ts',
@@ -32,6 +32,6 @@ export default [
             format: 'iife',
             entryFileNames: 'videoPlayer.js',
         },
-        plugins: [resolve(), commonjs(), typescript()],
+        plugins: [terser(), resolve(), commonjs(), typescript()],
     }
 ];
