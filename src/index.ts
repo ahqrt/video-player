@@ -57,8 +57,14 @@ class BoomVideoPlayer {
      */
     private currentPlayTime: number
 
+    /**
+     * 封面
+     */
     private poster: string | undefined
 
+    /**
+     * 初始定位时间
+     */
     private time : number | undefined
 
     constructor(props:BoomVideoProps) {
@@ -240,6 +246,10 @@ class BoomVideoPlayer {
      */
     private getPlayTime = () => this.videoElement!.currentTime
 
+    /**
+     * 给rn端和iframe端推送消息
+     * @param message
+     */
     private static postMessage = <T>(message: T) => {
         // 添加react Native 的事件信息处理
         // eslint-disable-next-line @typescript-eslint/no-unused-expressions
@@ -253,7 +263,7 @@ class BoomVideoPlayer {
     private getMediaDuration = () => this.videoElement!.duration
 
     /**
-     * 生成播放状态改变的信息
+     * 生成changePlayEvent播放状态改变的信息
      * @param isStartPlay
      * @param timeSeconds
      * @param duration
@@ -266,6 +276,11 @@ class BoomVideoPlayer {
         type: 'changePlayEvent'
     })
 
+    /**
+     * 生成 seekEvent 对应的info信息
+     * @param {SeekEventInfo} props
+     * @returns
+     */
     private static seekEventInfo = (props: SeekEventInfo) => ({
         seekTime: props.seekedTime,
         duration: props.videoDuration,
@@ -273,6 +288,11 @@ class BoomVideoPlayer {
         type: 'seekEvent'
     })
 
+    /**
+     * 生成 updateTimeEvent 对应的info信息
+     * @param props
+     * @returns
+     */
     private static updateTimeEventInfo = (props: UpdateTimeEventInfo) => ({
         timeSeconds: props.timeSeconds,
         duration: props.duration,
