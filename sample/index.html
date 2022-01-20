@@ -6,9 +6,7 @@
     <link rel="stylesheet" href="../dist/bundle.css">
 </head>
 <body>
-<div style="width: 100%;height: 393px" id="player-container"></div>
-<button id="startPlay">播放</button>
-<button id="stopPlay">暂停</button>
+<div style="width: 100%;" id="player-container"></div>
     <script src="../dist/videoPlayer.js"></script>
     <script>
         const player = new BoomVideoPlayer({
@@ -17,19 +15,12 @@
             // playUrl: 'https://hb.boom.cn:443/test/1642398642/var/www/html/media/files/61e503b1044ebc1ea2ad7387/YSiVplaFYy-idx.flv',
             canSlider: true,
             time:9,
-            poster: 'https://rumenz.com/static/cimg/img/demo2.jpg'
+            poster: 'https://rumenz.com/static/cimg/img/demo2.jpg',
+            noSlider: true
             // autoplay: 'autoplay'
         })
         player.createGUI(document.getElementById('player-container'))
         player.initPlayer()
-        const startPlay = document.getElementById('startPlay')
-        startPlay.addEventListener('click', () => {
-            player.play()
-        })
-        const stopPlay = document.getElementById('stopPlay')
-        stopPlay.addEventListener('click', () => {
-            player.pause()
-        })
     </script>
 </body>
 </html>

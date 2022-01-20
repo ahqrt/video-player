@@ -102,6 +102,8 @@ class BoomVideoPlayer {
         const videoPlayer = astCompiler<HTMLVideoElement>('video', { attr: { type: 'style', content: videoStyle } })
         videoPlayer.playsInline = true
         videoPlayer.className = 'video-js vjs-big-play-centered vjs-fluid'
+        videoPlayer.setAttribute('webkit-playsinline', 'webkit-playsinline')
+        videoPlayer.playsInline = true
         this.videoElement = videoPlayer
         container.appendChild(videoPlayer)
     }
