@@ -18,6 +18,7 @@ interface BoomVideoProps {
     poster?: string
     time?: number
     noSlider?: boolean
+    canDBSpeed?: boolean
 }
 
 interface ChangePlayEventInfo {
@@ -79,6 +80,8 @@ class BoomVideoPlayer {
      */
     private videoPlayer: VideoJsPlayer | undefined
 
+    private canDBSpeed: boolean | undefined
+
     constructor(props:BoomVideoProps) {
         console.log(props)
         this.playerUrl = props.playerUrl
@@ -86,6 +89,7 @@ class BoomVideoPlayer {
         this.poster = props?.poster
         this.time = props?.time
         this.noSlider = props?.noSlider
+        this.canDBSpeed = props?.canDBSpeed || false
         this.videoElement = null
         this.currentPlayTime = 0
     }
@@ -120,6 +124,7 @@ class BoomVideoPlayer {
                 language: 'zh-CN',
                 preload: 'auto',
                 fluid: true,
+                playbackRates: this.canDBSpeed ? [0.5, 1, 1.5, 2] : undefined,
                 controlBar: {
                     playToggle: true,
                     currentTimeDisplay: true,
