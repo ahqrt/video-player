@@ -58,6 +58,7 @@
     "@types/video.js": "^7.3.29",
     "csstype": "^3.0.10",
     "lodash-es": "^4.17.21",
+    "nplayer": "^1.0.10",
     "rollup-plugin-postcss": "^4.0.2",
     "video.js": "^7.17.0"
   }

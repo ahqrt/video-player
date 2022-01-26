@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="../dist/bundle.css">
 </head>
 <body>
-<div style="width: 100%;" id="player-container"></div>
+<div style="width: 100%; height: 800px;" id="player-container"></div>
     <script src="../dist/videoPlayer.js"></script>
     <script>
         const player = new BoomVideoPlayer({
@@ -19,8 +19,7 @@
             canDBSpeed:true
             // autoplay: 'autoplay'
         })
-        player.createGUI(document.getElementById('player-container'))
-        player.initPlayer()
+        player.initPlayer('player-container')
     </script>
 </body>
 </html>

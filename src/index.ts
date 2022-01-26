@@ -1,10 +1,5 @@
-import * as CSS from 'csstype'
 import { throttle } from 'lodash-es'
-import VideoJs, { VideoJsPlayer } from 'video.js'
-import { astCompiler } from './utils/astCompiler'
-import 'video.js/dist/video-js.css'
-import './index.css'
-import 'video.js/dist/lang/zh-CN.json'
+import Player from 'nplayer'
 
 declare global {
     interface Window {
@@ -38,13 +33,26 @@ interface UpdateTimeEventInfo {
     duration: number
 }
 
-class BoomVideoPlayer {
-    /**
-     * 创建的播放器元素
-     * @private
-     */
-    private videoElement: null | HTMLVideoElement
+// const speedSettingItem: SettingItem = {
+//     html: '播放速度',
+//     type: 'select',
+//     value: 1,
+//     options: [
+//         { value: 0.25, html: '0.25' },
+//         { value: 0.5, html: '0.5' },
+//         { value: 1, html: '1' },
+//         { value: 1.5, html: '1.5' }
+//     ],
+//     init(player) {
+//         player.playbackRate = 1
+//     },
+//     change(value, player) {
+//         player.playbackRate = value
+//     }
 
+// }
+
+class BoomVideoPlayer {
     /**
      * 播放地址url
      * @private
@@ -78,7 +86,7 @@ class BoomVideoPlayer {
     /**
      * 播放器实例
      */
-    private videoPlayer: VideoJsPlayer | undefined
+    private videoPlayer: Player | undefined
 
     private canDBSpeed: boolean | undefined
 
@@ -90,75 +98,32 @@ class BoomVideoPlayer {
         this.time = props?.time
         this.noSlider = props?.noSlider
         this.canDBSpeed = props?.canDBSpeed || false
-        this.videoElement = null
         this.currentPlayTime = 0
-    }
-
-    /**
-     * 创建播放器ui
-     * @param {HTMLDivElement} container 传入的外层div容器
-     */
-    createGUI(container:HTMLDivElement) {
-        const videoStyle:CSS.Properties = {
-            width: '100%',
-            height: '100%'
-        }
-        const videoPlayer = astCompiler<HTMLVideoElement>('video', { attr: { type: 'style', content: videoStyle } })
-        videoPlayer.playsInline = true
-        videoPlayer.className = 'video-js vjs-big-play-centered vjs-fluid'
-        videoPlayer.setAttribute('webkit-playsinline', 'webkit-playsinline')
-        videoPlayer.playsInline = true
-        this.videoElement = videoPlayer
-        container.appendChild(videoPlayer)
     }
 
     /**
      * 初始化播放器参数
      */
-    initPlayer() {
-        if (this.videoElement) {
-            const player = VideoJs(this.videoElement, {
-                controls: true,
-                poster: this.poster,
-                autoplay: this.autoplay,
-                language: 'zh-CN',
-                preload: 'auto',
-                fluid: true,
-                playbackRates: this.canDBSpeed ? [0.5, 1, 1.5, 2] : undefined,
-                controlBar: {
-                    playToggle: true,
-                    currentTimeDisplay: true,
-                    progressControl: !this.noSlider,
-                    durationDisplay: true,
-                    volumePanel: { inline: false, volumeControl: { vertical: true } },
-                    fullscreenToggle: true
-                },
-                sources: [
-                    {
-                        src: this.playerUrl,
-                        type: 'video/mp4'
-                        // type: 'video/flv'
-                    }
-                ]
-            }, () => {
-                console.log('播放器初始化完毕')
-                this.videoPlayer = player
-                this.addVideoEventListener(this.videoPlayer)
+    initPlayer(containerId: string | HTMLDivElement) {
+        const player = new Player({
+            src: this.playerUrl,
+            autoSeekTime: this.time,
+            poster: this.poster,
+            controls: [
+                ['play', 'volume', 'time', 'spacer', this.canDBSpeed ? 'settings' : '', 'web-fullscreen', 'fullscreen'],
+                !this.noSlider ? ['progress'] : []
+            ]
+        })
 
-                if (this.time) {
-                    this.videoPlayer?.on('loadedmetadata', () => {
-                        console.log('加载完了资源文件')
-                        this.seekingTime(this.time as number)
-                    })
-                    // this.seekingTime(this.time)
-                }
-            })
+        console.log('播放器初始化完毕')
+        this.videoPlayer = player
+        this.addVideoEventListener(this.videoPlayer)
 
-            // this.videoElement.src = this.playerUrl
-            // this.videoElement.autoplay = this.autoplay
-            // if (this.poster) {
-            //     this.videoElement.poster = this.poster
-            // }
+        if (typeof containerId === 'string') {
+            this.videoPlayer.mount(document.getElementById(containerId) as HTMLElement)
+        }
+        else {
+            this.videoPlayer.mount(containerId)
         }
     }
 
@@ -180,7 +145,7 @@ class BoomVideoPlayer {
      * 给video标签添加监听事件
      * @param {HTMLVideoElement} videoEle
      */
-    private addVideoEventListener(videoEle: VideoJsPlayer) {
+    private addVideoEventListener(videoEle: Player) {
         videoEle.on('timeupdate', this.handleTimeUpdate)
         videoEle.on('fullscreenchange', BoomVideoPlayer.handleFullscreenChange)
         videoEle.on('ended', this.handlePlayerEnd)
@@ -275,7 +240,6 @@ class BoomVideoPlayer {
      * 监听视频播放进度处理函数
      */
     private handleTimeUpdate = throttle(() => {
-        console.log('视频播放进度', this.videoElement?.currentTime)
         this.currentPlayTime = this.getPlayTime()
         const updateTimeInfo:UpdateTimeEventInfo = {
             timeSeconds: this.getPlayTime(),
@@ -290,15 +254,14 @@ class BoomVideoPlayer {
      * @param {Number} time 传入定位的时间戳
      */
     seekingTime(time: number) {
-        this.videoPlayer?.currentTime(time)
-        // this.videoPlayer!.setCurrentTime(time)
-        // this.videoElement!.currentTime = time
+        console.log('定位', time)
+        this.videoPlayer!.seek(time)
     }
 
     /**
      * 获取播放进度
      */
-    private getPlayTime = () => this.videoPlayer!.currentTime()
+    private getPlayTime = () => this.videoPlayer!.currentTime
 
     /**
      * 给rn端和iframe端推送消息
@@ -314,7 +277,7 @@ class BoomVideoPlayer {
     /**
      * 获取当前视频的时长
      */
-    private getMediaDuration = () => this.videoPlayer!.duration()
+    private getMediaDuration = () => this.videoPlayer!.duration
 
     /**
      * 生成changePlayEvent播放状态改变的信息
