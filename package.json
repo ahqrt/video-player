@@ -60,6 +60,7 @@
     "lodash-es": "^4.17.21",
     "nplayer": "^1.0.10",
     "rollup-plugin-postcss": "^4.0.2",
-    "video.js": "^7.17.0"
+    "video.js": "^7.17.0",
+    "xgplayer": "^2.31.4"
   }
 }

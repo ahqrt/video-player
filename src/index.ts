@@ -1,5 +1,5 @@
 import { throttle } from 'lodash-es'
-import Player from 'nplayer'
+import Player from 'xgplayer'
 
 declare global {
     interface Window {
@@ -14,6 +14,7 @@ interface BoomVideoProps {
     time?: number
     noSlider?: boolean
     canDBSpeed?: boolean
+    noFullscreen?: boolean
 }
 
 interface ChangePlayEventInfo {
@@ -32,25 +33,6 @@ interface UpdateTimeEventInfo {
     timeSeconds: number
     duration: number
 }
-
-// const speedSettingItem: SettingItem = {
-//     html: '播放速度',
-//     type: 'select',
-//     value: 1,
-//     options: [
-//         { value: 0.25, html: '0.25' },
-//         { value: 0.5, html: '0.5' },
-//         { value: 1, html: '1' },
-//         { value: 1.5, html: '1.5' }
-//     ],
-//     init(player) {
-//         player.playbackRate = 1
-//     },
-//     change(value, player) {
-//         player.playbackRate = value
-//     }
-
-// }
 
 class BoomVideoPlayer {
     /**
@@ -81,7 +63,15 @@ class BoomVideoPlayer {
      */
     private time : number | undefined
 
+    /**
+     * 是否不展示进度条
+     */
     private noSlider : boolean | undefined
+
+    /**
+     * 是否不展示全屏按钮
+     */
+    private noFullscreen: boolean | undefined
 
     /**
      * 播放器实例
@@ -98,33 +88,43 @@ class BoomVideoPlayer {
         this.time = props?.time
         this.noSlider = props?.noSlider
         this.canDBSpeed = props?.canDBSpeed || false
+        this.noFullscreen = props?.noFullscreen || false
         this.currentPlayTime = 0
     }
 
     /**
      * 初始化播放器参数
      */
-    initPlayer(containerId: string | HTMLDivElement) {
+    initPlayer(containerId: string) {
+        const ignoresList = () => {
+            const renderList = new Set(['download'])
+            if (this.noFullscreen) {
+                renderList.add('fullscreen')
+            }
+            if (this.noSlider) {
+                renderList.add('progress')
+            }
+            if (!this.canDBSpeed) {
+                renderList.add('playbackRate')
+            }
+            console.log('Array.from(renderList)', Array.from(renderList))
+            return Array.from(renderList) as any
+        }
         const player = new Player({
-            src: this.playerUrl,
-            autoSeekTime: this.time,
+            el: document.getElementById(containerId) as HTMLDivElement,
+            url: this.playerUrl,
             poster: this.poster,
-            controls: [
-                ['play', 'volume', 'time', 'spacer', this.canDBSpeed ? 'settings' : '', 'web-fullscreen', 'fullscreen'],
-                !this.noSlider ? ['progress'] : []
-            ]
+            videoInit: true,
+            playbackRate: [0.25, 0.5, 1, 1.5, 2],
+            lastPlayTime: this.time || 0,
+            playsinline: true,
+            ignores: ignoresList(),
+            fluid: true
         })
 
         console.log('播放器初始化完毕')
         this.videoPlayer = player
         this.addVideoEventListener(this.videoPlayer)
-
-        if (typeof containerId === 'string') {
-            this.videoPlayer.mount(document.getElementById(containerId) as HTMLElement)
-        }
-        else {
-            this.videoPlayer.mount(containerId)
-        }
     }
 
     /**
@@ -170,7 +170,7 @@ class BoomVideoPlayer {
         console.log('播放结束')
         const endInfo: ChangePlayEventInfo = {
             isStartPlay: false,
-            timeSeconds: this.getPlayTime(),
+            timeSeconds: this.getMediaDuration(),
             duration: this.getMediaDuration()
         }
         console.log('endInfo', endInfo)
@@ -248,15 +248,6 @@ class BoomVideoPlayer {
         console.log('updateTimeInfo', updateTimeInfo)
         BoomVideoPlayer.postMessage(BoomVideoPlayer.updateTimeEventInfo(updateTimeInfo))
     }, 1000)
-
-    /** ß
-     * 处理传入时间的处理
-     * @param {Number} time 传入定位的时间戳
-     */
-    seekingTime(time: number) {
-        console.log('定位', time)
-        this.videoPlayer!.seek(time)
-    }
 
     /**
      * 获取播放进度
