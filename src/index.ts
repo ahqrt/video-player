@@ -1,5 +1,10 @@
 import { throttle } from 'lodash-es'
 import Player from 'xgplayer'
+// eslint-disable-next-line import/extensions
+import './skin/.xgplayer/skin/index.js'
+import {
+    isTrue
+} from './utils/isTrue.js'
 
 declare global {
     interface Window {
@@ -83,12 +88,12 @@ class BoomVideoPlayer {
     constructor(props:BoomVideoProps) {
         console.log(props)
         this.playerUrl = props.playerUrl
-        this.autoplay = props?.autoplay || false
+        this.autoplay = isTrue(props?.autoplay) || false
         this.poster = props?.poster
         this.time = props?.time
-        this.noSlider = props?.noSlider
-        this.canDBSpeed = props?.canDBSpeed || false
-        this.noFullscreen = props?.noFullscreen || false
+        this.noSlider = isTrue(props?.noSlider) || false
+        this.canDBSpeed = isTrue(props?.canDBSpeed) || false
+        this.noFullscreen = isTrue(props?.noFullscreen) || false
         this.currentPlayTime = 0
     }
 
@@ -119,7 +124,9 @@ class BoomVideoPlayer {
             lastPlayTime: this.time || 0,
             playsinline: true,
             ignores: ignoresList(),
-            fluid: true
+            width: '100%',
+            height: '100%',
+            lang: 'zh-cn'
         })
 
         console.log('播放器初始化完毕')

@@ -58,8 +58,11 @@
     "@types/video.js": "^7.3.29",
     "csstype": "^3.0.10",
     "lodash-es": "^4.17.21",
+    "node-sass": "^7.0.1",
     "nplayer": "^1.0.10",
     "rollup-plugin-postcss": "^4.0.2",
+    "rollup-plugin-scss": "^3.0.0",
+    "rollup-plugin-svg": "^2.0.0",
     "video.js": "^7.17.0",
     "xgplayer": "^2.31.4"
   }
