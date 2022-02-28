@@ -20,6 +20,8 @@ interface BoomVideoProps {
     noSlider?: boolean
     canDBSpeed?: boolean
     noFullscreen?: boolean
+    handleEventCallback? (event: any): void
+    noSendMessage: boolean
 }
 
 interface ChangePlayEventInfo {
@@ -85,6 +87,10 @@ class BoomVideoPlayer {
 
     private canDBSpeed: boolean | undefined
 
+    private handleEventCallBack: ((event: any) => void) | undefined
+
+    private noSendMessage: boolean
+
     constructor(props:BoomVideoProps) {
         console.log(props)
         this.playerUrl = props.playerUrl
@@ -94,7 +100,9 @@ class BoomVideoPlayer {
         this.noSlider = isTrue(props?.noSlider) || false
         this.canDBSpeed = isTrue(props?.canDBSpeed) || false
         this.noFullscreen = isTrue(props?.noFullscreen) || false
+        this.handleEventCallBack = props?.handleEventCallback || undefined
         this.currentPlayTime = 0
+        this.noSendMessage = isTrue(props?.noSendMessage) || false
     }
 
     /**
@@ -180,8 +188,10 @@ class BoomVideoPlayer {
             timeSeconds: this.getMediaDuration(),
             duration: this.getMediaDuration()
         }
-        console.log('endInfo', endInfo)
-        BoomVideoPlayer.postMessage(BoomVideoPlayer.changePlayEventInfo(endInfo))
+        if (!this.noSendMessage) {
+            console.log('send message endInfo', endInfo)
+            this.postMessage(BoomVideoPlayer.palyEndedEventInfo(endInfo))
+        }
     }
 
     /**
@@ -194,9 +204,10 @@ class BoomVideoPlayer {
             videoDuration: this.getMediaDuration(),
             isSeeking: true
         }
-        console.log('seekingInfo', seekingInfo)
-
-        BoomVideoPlayer.postMessage(BoomVideoPlayer.seekEventInfo(seekingInfo))
+        if (!this.noSendMessage) {
+            console.log('send message seekingInfo', seekingInfo)
+            this.postMessage(BoomVideoPlayer.seekEventInfo(seekingInfo))
+        }
     }, 2000)
 
     /**
@@ -209,9 +220,11 @@ class BoomVideoPlayer {
             videoDuration: this.getMediaDuration(),
             isSeeking: false
         }
-        console.log('seekingInfo', seekingInfo)
 
-        BoomVideoPlayer.postMessage(BoomVideoPlayer.seekEventInfo(seekingInfo))
+        if (!this.noSendMessage) {
+            console.log('send message seekingInfo', seekingInfo)
+            this.postMessage(BoomVideoPlayer.seekEventInfo(seekingInfo))
+        }
     }, 2000)
 
     /**
@@ -224,8 +237,10 @@ class BoomVideoPlayer {
             timeSeconds: this.getPlayTime(),
             duration: this.getMediaDuration()
         }
-        console.log('play info', playInfo)
-        BoomVideoPlayer.postMessage(BoomVideoPlayer.changePlayEventInfo(playInfo))
+        if (!this.noSendMessage) {
+            console.log('send message play info', playInfo)
+            this.postMessage(BoomVideoPlayer.changePlayEventInfo(playInfo))
+        }
     }
 
     /**
@@ -239,8 +254,10 @@ class BoomVideoPlayer {
             duration: this.getMediaDuration()
 
         }
-        console.log('pauseInfo', pauseInfo)
-        BoomVideoPlayer.postMessage(BoomVideoPlayer.changePlayEventInfo(pauseInfo))
+        if (!this.noSendMessage) {
+            console.log('send message pauseInfo', pauseInfo)
+            this.postMessage(BoomVideoPlayer.changePlayEventInfo(pauseInfo))
+        }
     }
 
     /**
@@ -252,8 +269,10 @@ class BoomVideoPlayer {
             timeSeconds: this.getPlayTime(),
             duration: this.getMediaDuration()
         }
-        console.log('updateTimeInfo', updateTimeInfo)
-        BoomVideoPlayer.postMessage(BoomVideoPlayer.updateTimeEventInfo(updateTimeInfo))
+        if (!this.noSendMessage) {
+            console.log('send message updateTimeInfo', updateTimeInfo)
+            this.postMessage(BoomVideoPlayer.updateTimeEventInfo(updateTimeInfo))
+        }
     }, 1000)
 
     /**
@@ -265,11 +284,15 @@ class BoomVideoPlayer {
      * 给rn端和iframe端推送消息
      * @param message
      */
-    private static postMessage = <T>(message: T) => {
+    private postMessage = <T>(message: T) => {
+        console.log('postMessage', postMessage)
         // 添加react Native 的事件信息处理
         // eslint-disable-next-line @typescript-eslint/no-unused-expressions
         window.ReactNativeWebView && window.ReactNativeWebView.postMessage(JSON.stringify(message))
         window.parent.postMessage(JSON.stringify(message), '*')
+        if (this.handleEventCallBack) {
+            this.handleEventCallBack(JSON.stringify(message))
+        }
     }
 
     /**
@@ -289,6 +312,13 @@ class BoomVideoPlayer {
         timeSeconds: props.timeSeconds,
         duration: props.duration,
         type: 'changePlayEvent'
+    })
+
+    private static palyEndedEventInfo = (props:ChangePlayEventInfo) => ({
+        startPlay: props.isStartPlay,
+        timeSeconds: props.timeSeconds,
+        duration: props.duration,
+        type: 'playEndedEvent'
     })
 
     /**
