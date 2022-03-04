@@ -5,10 +5,18 @@ import './skin/.xgplayer/skin/index.js'
 import {
     isTrue
 } from './utils/isTrue.js'
+// eslint-disable-next-line import/extensions
+import { isFullScreen } from './skin/.xgplayer/skin/controls/fullscreen.js'
 
+console.log('isFullScreen', isFullScreen)
+
+export const noIOSFullScreen = {
+    noIOSFullScreen: false
+}
 declare global {
     interface Window {
-        ReactNativeWebView: any
+        ReactNativeWebView: any,
+        webkit:any
     }
 }
 
@@ -108,6 +116,7 @@ class BoomVideoPlayer {
         this.currentPlayTime = 0
         this.noSendMessage = isTrue(props?.noSendMessage) || false
         this.noIOSFullScreen = isTrue(props?.noIOSFullScreen) || false
+        noIOSFullScreen.noIOSFullScreen = isTrue(props?.noIOSFullScreen) || false
     }
 
     /**
@@ -139,8 +148,8 @@ class BoomVideoPlayer {
             ignores: ignoresList(),
             width: '100%',
             height: '100%',
-            lang: 'zh-cn',
-            rotateFullscreen: true
+            lang: 'zh-cn'
+            // rotateFullscreen: true
         })
 
         console.log('播放器初始化完毕')
@@ -174,11 +183,6 @@ class BoomVideoPlayer {
         videoEle.on('seeked', this.handlePlayerSeekEnd)
         videoEle.on('play', this.handlePlayerPlay)
         videoEle.on('pause', this.handlePlayerPause)
-        videoEle.on('fullscreen', this.handleEnterFullscreen)
-    }
-
-    private handleEnterFullscreen = () => {
-
     }
 
     /**
@@ -354,6 +358,16 @@ class BoomVideoPlayer {
         duration: props.duration,
         type: 'updateTimeEvent'
     })
+
+    static sendIOSIsFullScreenMessage = (message: boolean) => {
+        window?.webkit?.messageHandlers?.changeScreen?.postMessage(message)
+        window?.webkit?.messageHandlers?.message?.postMessage(message)
+        window?.ReactNativeWebView?.postMessage(JSON.stringify({ isFullScreen: message, type: 'fullscreenEvent' }))
+    }
+
+    private static setIsFullScreen() {
+        isFullScreen.isFullScreen = false
+    }
 }
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment

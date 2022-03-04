@@ -2,6 +2,20 @@ import { createDom, createImgBtn } from 'xgplayer/src/utils/util'
 import RequestFullIcon from '../assets/requestFull.svg'
 import ExitFullIcon from '../assets/exitFull.svg'
 import '../style/controls/fullscreen.scss'
+import sniffer from 'xgplayer/src/utils/sniffer'
+
+console.log('sniffer.os', sniffer.os);
+
+export const isFullScreen = {
+    isFullScreen: false
+}
+
+const sendIOSIsFullScreenMessage = (message) => {
+    window?.webkit?.messageHandlers?.changeScreen?.postMessage(message)
+    window?.webkit?.messageHandlers?.message?.postMessage(message)
+    window?.ReactNativeWebView?.postMessage(JSON.stringify({ isFullScreen: message, type: 'fullscreenEvent' }))
+}
+
 
 let s_fullscreen = function () {
   let player = this
@@ -32,7 +46,17 @@ let s_fullscreen = function () {
     btn.addEventListener(item, function (e) {
       e.preventDefault()
       e.stopPropagation()
-      player.userGestureTrigEvent('fullscreenBtnClick')
+      console.log('点击了全屏处理按钮');
+      if(sniffer.os.isPhone) {
+        if(isFullScreen.isFullScreen) {
+            sendIOSIsFullScreenMessage(false)
+        }else {
+            sendIOSIsFullScreenMessage(true)
+        }
+        isFullScreen.isFullScreen = !isFullScreen.isFullScreen
+      }else {
+        player.userGestureTrigEvent('fullscreenBtnClick')
+      }
     })
   })
 }
