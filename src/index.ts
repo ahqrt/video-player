@@ -22,6 +22,7 @@ interface BoomVideoProps {
     noFullscreen?: boolean
     handleEventCallback? (event: any): void
     noSendMessage: boolean
+    noIOSFullScreen?: boolean
 }
 
 interface ChangePlayEventInfo {
@@ -91,6 +92,9 @@ class BoomVideoPlayer {
 
     private noSendMessage: boolean
 
+    // ios 全屏按钮重写
+    private noIOSFullScreen : boolean
+
     constructor(props:BoomVideoProps) {
         console.log(props)
         this.playerUrl = props.playerUrl
@@ -103,6 +107,7 @@ class BoomVideoPlayer {
         this.handleEventCallBack = props?.handleEventCallback || undefined
         this.currentPlayTime = 0
         this.noSendMessage = isTrue(props?.noSendMessage) || false
+        this.noIOSFullScreen = isTrue(props?.noIOSFullScreen) || false
     }
 
     /**
@@ -134,7 +139,8 @@ class BoomVideoPlayer {
             ignores: ignoresList(),
             width: '100%',
             height: '100%',
-            lang: 'zh-cn'
+            lang: 'zh-cn',
+            rotateFullscreen: true
         })
 
         console.log('播放器初始化完毕')
@@ -168,6 +174,11 @@ class BoomVideoPlayer {
         videoEle.on('seeked', this.handlePlayerSeekEnd)
         videoEle.on('play', this.handlePlayerPlay)
         videoEle.on('pause', this.handlePlayerPause)
+        videoEle.on('fullscreen', this.handleEnterFullscreen)
+    }
+
+    private handleEnterFullscreen = () => {
+
     }
 
     /**
