@@ -6,6 +6,7 @@ import css from "rollup-plugin-import-css"
 import json from '@rollup/plugin-json';
 import scss from 'rollup-plugin-scss'
 import svg from 'rollup-plugin-svg'
+import { babel } from '@rollup/plugin-babel'
 export default [
     // {
     //     input: './src/index.ts',
@@ -36,6 +37,6 @@ export default [
             format: 'iife',
             entryFileNames: 'videoPlayer.js',
         },
-        plugins: [terser(), resolve(), commonjs(),json(), typescript(), css(), scss(), svg()],
+        plugins: [terser(),babel({extensions: ['.js', '.ts'], exclude: 'node_modules/**'}), resolve(), commonjs(),json(), typescript(), css(), scss(), svg()],
     }
 ];

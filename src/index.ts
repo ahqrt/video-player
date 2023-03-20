@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { throttle } from 'lodash-es'
 import Player from 'xgplayer'
 // eslint-disable-next-line import/extensions
@@ -5,6 +6,8 @@ import './skin/.xgplayer/skin/index.js'
 import {
     isTrue
 } from './utils/isTrue.js'
+// eslint-disable-next-line import/extensions
+// @ts-ignore
 // eslint-disable-next-line import/extensions
 import { isFullScreen } from './skin/.xgplayer/skin/controls/fullscreen.js'
 
@@ -16,7 +19,7 @@ export const noIOSFullScreen = {
 declare global {
     interface Window {
         ReactNativeWebView: any,
-        webkit:any
+        webkit: any
     }
 }
 
@@ -28,7 +31,7 @@ interface BoomVideoProps {
     noSlider?: boolean
     canDBSpeed?: boolean
     noFullscreen?: boolean
-    handleEventCallback? (event: any): void
+    handleEventCallback?(event: any): void
     noSendMessage: boolean
     noIOSFullScreen?: boolean
 }
@@ -40,8 +43,8 @@ interface ChangePlayEventInfo {
 }
 
 interface SeekEventInfo {
-    seekedTime:number
-    videoDuration:number
+    seekedTime: number
+    videoDuration: number
     isSeeking: boolean
 }
 
@@ -77,12 +80,12 @@ class BoomVideoPlayer {
     /**
      * 初始定位时间
      */
-    private time : number | undefined
+    private time: number | undefined
 
     /**
      * 是否不展示进度条
      */
-    private noSlider : boolean | undefined
+    private noSlider: boolean | undefined
 
     /**
      * 是否不展示全屏按钮
@@ -101,9 +104,9 @@ class BoomVideoPlayer {
     private noSendMessage: boolean
 
     // ios 全屏按钮重写
-    private noIOSFullScreen : boolean
+    private noIOSFullScreen: boolean
 
-    constructor(props:BoomVideoProps) {
+    constructor(props: BoomVideoProps) {
         console.log(props)
         this.playerUrl = props.playerUrl
         this.autoplay = isTrue(props?.autoplay) || false
@@ -189,7 +192,7 @@ class BoomVideoPlayer {
      * 监听全屏事件处理
      * @param e
      */
-    private static handleFullscreenChange(e:Event) {
+    private static handleFullscreenChange(e: Event) {
         console.log('全屏切换', e)
     }
 
@@ -214,7 +217,7 @@ class BoomVideoPlayer {
      */
     private handlePlayerSeeking = throttle(() => {
         console.log('进度条开始拖动')
-        const seekingInfo:SeekEventInfo = {
+        const seekingInfo: SeekEventInfo = {
             seekedTime: this.getPlayTime(),
             videoDuration: this.getMediaDuration(),
             isSeeking: true
@@ -230,7 +233,7 @@ class BoomVideoPlayer {
      */
     private handlePlayerSeekEnd = throttle(() => {
         console.log('进度条拖动结束')
-        const seekingInfo:SeekEventInfo = {
+        const seekingInfo: SeekEventInfo = {
             seekedTime: this.getPlayTime(),
             videoDuration: this.getMediaDuration(),
             isSeeking: false
@@ -247,7 +250,7 @@ class BoomVideoPlayer {
      */
     private handlePlayerPlay = () => {
         console.log('开始播放')
-        const playInfo:ChangePlayEventInfo = {
+        const playInfo: ChangePlayEventInfo = {
             isStartPlay: true,
             timeSeconds: this.getPlayTime(),
             duration: this.getMediaDuration()
@@ -280,7 +283,7 @@ class BoomVideoPlayer {
      */
     private handleTimeUpdate = throttle(() => {
         this.currentPlayTime = this.getPlayTime()
-        const updateTimeInfo:UpdateTimeEventInfo = {
+        const updateTimeInfo: UpdateTimeEventInfo = {
             timeSeconds: this.getPlayTime(),
             duration: this.getMediaDuration()
         }
@@ -322,14 +325,14 @@ class BoomVideoPlayer {
      * @param duration
      * @returns
      */
-    private static changePlayEventInfo = (props:ChangePlayEventInfo) => ({
+    private static changePlayEventInfo = (props: ChangePlayEventInfo) => ({
         startPlay: props.isStartPlay,
         timeSeconds: props.timeSeconds,
         duration: props.duration,
         type: 'changePlayEvent'
     })
 
-    private static palyEndedEventInfo = (props:ChangePlayEventInfo) => ({
+    private static palyEndedEventInfo = (props: ChangePlayEventInfo) => ({
         startPlay: props.isStartPlay,
         timeSeconds: props.timeSeconds,
         duration: props.duration,
